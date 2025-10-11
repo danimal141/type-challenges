@@ -135,6 +135,11 @@ OR
 pnpm generate -K
 ```
 
+```bash
+# After fixing the code
+npx tsc --noEmit playground/warm/00013-warm-hello-world.ts
+```
+
 ## Thanks
 
 This project was born from solving real-world types problem with [@hardfist](https://github.com/hardfist) and [@MeCKodo](https://github.com/MeCKodo). And great thanks to [@sinoon](https://github.com/sinoon) who contributed a lot while giving early feedback on this project.
