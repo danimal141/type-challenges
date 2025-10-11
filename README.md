@@ -137,7 +137,7 @@ pnpm generate -K
 
 ```bash
 # After fixing the code
-npx tsc --noEmit playground/warm/00013-warm-hello-world.ts
+pnpm exec tsc --noEmit playground/warm/00013-warm-hello-world.ts
 ```
 
 ## Thanks
