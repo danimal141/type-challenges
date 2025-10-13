@@ -18,7 +18,7 @@
 
 /* _____________ ここにコードを記入 _____________ */
 
-type MyExclude<T, U> = any
+type MyExclude<T, U> = T extends U ? never : T
 
 /* _____________ テストケース _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
