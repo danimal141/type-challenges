@@ -1,7 +1,15 @@
 import path from 'node:path'
 import fs from 'fs-extra'
 import { loadQuizzes, resolveInfo } from './loader'
-import { REPO, toPlaygroundUrl, toQuestionsRawREADME, toQuizREADME, toRawREADME, toShareAnswerFull, toSolutionsFull } from './toUrl'
+import {
+  REPO,
+  toPlaygroundUrl,
+  toQuestionsRawREADME,
+  toQuizREADME,
+  toRawREADME,
+  toShareAnswerFull,
+  toSolutionsFull,
+} from './toUrl'
 import { defaultLocale, supportedLocales } from './locales'
 import { formatToCode } from './actions/utils/formatToCode'
 
@@ -10,11 +18,13 @@ export async function build() {
   const redirects: [string, string, number][] = []
 
   // redirect homepage to github repo
-  supportedLocales.filter(locale => locale !== defaultLocale).forEach((locale) => {
-    redirects.push([`/${locale}`, `${REPO}/blob/main/README.${locale}.md`, 302])
-  })
+  supportedLocales
+    .filter(locale => locale !== defaultLocale)
+    .forEach(locale => {
+      redirects.push([`/${locale}`, `${REPO}/blob/main/README.${locale}.md`, 302])
+    })
 
-  supportedLocales.forEach((locale) => {
+  supportedLocales.forEach(locale => {
     redirects.push([`/raw/${locale}`, toQuestionsRawREADME(locale), 302])
   })
 
@@ -31,8 +41,7 @@ export async function build() {
         redirects.push([`/${quiz.no}/raw`, toRawREADME(quiz, locale), 302])
         redirects.push([`/${quiz.no}/play`, url, 302])
         redirects.push([`/${quiz.no}/answer`, toShareAnswerFull(quiz), 302])
-      }
-      else {
+      } else {
         redirects.push([`/${quiz.no}/${locale}`, toQuizREADME(quiz, locale, true), 302])
         redirects.push([`/${quiz.no}/raw/${locale}`, toRawREADME(quiz, locale), 302])
         redirects.push([`/${quiz.no}/play/${locale}`, url, 302])
@@ -48,7 +57,11 @@ export async function build() {
   await fs.remove(dist)
   await fs.ensureDir(dist)
 
-  await fs.writeFileSync(path.join(dist, '_redirects'), redirects.map(i => i.join('\t')).join('\n'), 'utf-8')
+  await fs.writeFileSync(
+    path.join(dist, '_redirects'),
+    redirects.map(i => i.join('\t')).join('\n'),
+    'utf-8',
+  )
 }
 
 build()

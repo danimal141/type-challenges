@@ -17,7 +17,7 @@ function calculateFileHash(filePathFull: string): Promise<string> {
     const hash = crypto.createHash('sha1')
     const fileStream = fs.createReadStream(filePathFull)
 
-    fileStream.on('data', (data) => {
+    fileStream.on('data', data => {
       hash.update(data)
     })
 
@@ -26,7 +26,7 @@ function calculateFileHash(filePathFull: string): Promise<string> {
       resolve(hash.digest('hex'))
     })
 
-    fileStream.on('error', (err) => {
+    fileStream.on('error', err => {
       reject(err)
     })
   })
@@ -47,8 +47,7 @@ async function takeSnapshot(quizzesPath: string) {
         ...snapshot,
         ...(await takeSnapshot(fPath)),
       }
-    }
-    else {
+    } else {
       snapshot[file] = await calculateFileHash(fPath)
     }
   }
@@ -57,16 +56,18 @@ async function takeSnapshot(quizzesPath: string) {
 }
 
 function readPlaygroundCache(playgroundCachePath: string): Snapshot {
-  if (!fs.existsSync(playgroundCachePath))
-    return {}
+  if (!fs.existsSync(playgroundCachePath)) return {}
 
   try {
     const rawCacheContent = fs.readFileSync(playgroundCachePath)
     return JSON.parse(rawCacheContent.toString())
-  }
-  catch (err) {
-    console.log(c.red('Playground cache corrupted. '
-    + 'Cannot generate playground without keeping your changes intact'))
+  } catch (err) {
+    console.log(
+      c.red(
+        'Playground cache corrupted. ' +
+          'Cannot generate playground without keeping your changes intact',
+      ),
+    )
     console.log(c.cyan('Please ensure you have run this: "pnpm generate"'))
     process.exit(1)
   }
@@ -76,17 +77,20 @@ function calculateOverridableFiles(cache: Snapshot, snapshot: Snapshot) {
   const result: Snapshot = {}
 
   for (const quizName in snapshot) {
-    if (snapshot[quizName] === cache[quizName])
-      result[quizName] = snapshot[quizName]
+    if (snapshot[quizName] === cache[quizName]) result[quizName] = snapshot[quizName]
   }
 
   return result
 }
 
-function isQuizWritable(quizFileName: string, overridableFiles: Snapshot, playgroundSnapshot: Snapshot): boolean {
+function isQuizWritable(
+  quizFileName: string,
+  overridableFiles: Snapshot,
+  playgroundSnapshot: Snapshot,
+): boolean {
   return !!(
-    overridableFiles[quizFileName]
-    || (!overridableFiles[quizFileName] && !playgroundSnapshot[quizFileName])
+    overridableFiles[quizFileName] ||
+    (!overridableFiles[quizFileName] && !playgroundSnapshot[quizFileName])
   )
 }
 
@@ -103,37 +107,42 @@ async function generatePlayground() {
   const currentPlaygroundCache = readPlaygroundCache(playgroundCachePath)
   let playgroundSnapshot: Snapshot
 
-  if (process.argv.length === 3 && (process.argv[2] === '--keep-changes' || process.argv[2] === '-K')) {
+  if (
+    process.argv.length === 3 &&
+    (process.argv[2] === '--keep-changes' || process.argv[2] === '-K')
+  ) {
     console.log(c.bold.cyan('We will keep your changes while generating.\n'))
     keepChanges = true
 
     playgroundSnapshot = await takeSnapshot(playgroundPath)
 
     overridableFiles = calculateOverridableFiles(currentPlaygroundCache, playgroundSnapshot)
-  }
-  else if (fs.existsSync(playgroundPath)) {
-    const result = await prompts([{
-      name: 'confirm',
-      type: 'confirm',
-      initial: false,
-      message: 'The playground directory already exists, it may contains the answers you did. Do you want to override it?',
-    }])
-    if (!result?.confirm)
-      return console.log(c.yellow('Skipped.'))
+  } else if (fs.existsSync(playgroundPath)) {
+    const result = await prompts([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        initial: false,
+        message:
+          'The playground directory already exists, it may contains the answers you did. Do you want to override it?',
+      },
+    ])
+    if (!result?.confirm) return console.log(c.yellow('Skipped.'))
   }
 
   if (!locale) {
-    const result = await prompts([{
-      name: 'locale',
-      type: 'select',
-      message: 'Select language:',
-      choices: supportedLocales.map(i => ({
-        title: i,
-        value: i,
-      })),
-    }])
-    if (!result)
-      return console.log(c.yellow('Skipped.'))
+    const result = await prompts([
+      {
+        name: 'locale',
+        type: 'select',
+        message: 'Select language:',
+        choices: supportedLocales.map(i => ({
+          title: i,
+          value: i,
+        })),
+      },
+    ])
+    if (!result) return console.log(c.yellow('Skipped.'))
     locale = result.locale
   }
 
@@ -159,18 +168,23 @@ async function generatePlayground() {
     const quizFileName = `${getQuestionFullName(quiz.no, difficulty, title)}.ts`
     const quizPathFull = path.join(quizzesPathByDifficulty, quizFileName)
 
-    if (!keepChanges || (keepChanges && isQuizWritable(quizFileName, overridableFiles!, playgroundSnapshot!))) {
-      if (!fs.existsSync(quizzesPathByDifficulty))
-        fs.mkdirSync(quizzesPathByDifficulty)
+    if (
+      !keepChanges ||
+      (keepChanges && isQuizWritable(quizFileName, overridableFiles!, playgroundSnapshot!))
+    ) {
+      if (!fs.existsSync(quizzesPathByDifficulty)) fs.mkdirSync(quizzesPathByDifficulty)
       await fs.writeFile(quizPathFull, code, 'utf-8')
       incomingQuizzesCache[quizFileName] = await calculateFileHash(quizPathFull)
     }
   }
 
-  fs.writeFile(playgroundCachePath, JSON.stringify({
-    ...currentPlaygroundCache,
-    ...incomingQuizzesCache,
-  }))
+  fs.writeFile(
+    playgroundCachePath,
+    JSON.stringify({
+      ...currentPlaygroundCache,
+      ...incomingQuizzesCache,
+    }),
+  )
 
   console.log()
   console.log(c.bold.green('Local playground generated at: ') + c.dim(playgroundPath))

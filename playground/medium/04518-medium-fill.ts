@@ -19,12 +19,7 @@
 
 /* _____________ ここにコードを記入 _____________ */
 
-type Fill<
-  T extends unknown[],
-  N,
-  Start extends number = 0,
-  End extends number = T['length'],
-> = any
+type Fill<T extends unknown[], N, Start extends number = 0, End extends number = T['length']> = any
 
 /* _____________ テストケース _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'

@@ -9,16 +9,14 @@ import { t } from './locales'
 
 export async function translateQuizByNo(no: number, from: SupportedLocale, to: SupportedLocale) {
   const quiz = await loadQuizByNo(no)
-  if (!quiz)
-    throw new Error(`Quiz #${no} not founded`)
+  if (!quiz) throw new Error(`Quiz #${no} not founded`)
   return await translateQuiz(quiz, from, to)
 }
 
 export async function translateQuiz(quiz: Quiz, from: SupportedLocale, to: SupportedLocale) {
   let translatedReadme = await translateMarkdown(quiz.readme[from], from, to)
 
-  if (!translatedReadme)
-    throw new Error(`Quiz #${quiz.no} empty translation`)
+  if (!translatedReadme) throw new Error(`Quiz #${quiz.no} empty translation`)
 
   translatedReadme = `> ${t(to, 'readme.google-translated')}\n\n${translatedReadme.trim()}`
 
@@ -34,12 +32,12 @@ export async function translateMarkdown(code: string, from: SupportedLocale, to:
   const codeBlocks: string[] = []
 
   const source = code
-    .replace(/```[\s\S\n]+?```/g, (v) => {
+    .replace(/```[\s\S\n]+?```/g, v => {
       const placeholder = `__${codeBlocks.length}__`
       codeBlocks.push(v)
       return placeholder
     })
-    .replace(/`[\s\S\n]+?`/g, (v) => {
+    .replace(/`[\s\S\n]+?`/g, v => {
       const placeholder = `__${codeBlocks.length}__`
       codeBlocks.push(v)
       return placeholder
@@ -50,8 +48,7 @@ export async function translateMarkdown(code: string, from: SupportedLocale, to:
     to,
   })
 
-  if (!text)
-    return
+  if (!text) return
 
   const result = text.replace(/__\s*?(\d+?)\s*?__/g, (_, i) => codeBlocks[+i])
 

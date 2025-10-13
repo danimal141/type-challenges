@@ -16,18 +16,30 @@ type Other = {
 
 type cases = [
   Expect<Equal<UnionToObjectFromKey<Foo | Bar, 'foo'>, Foo>>,
-  Expect<Equal<UnionToObjectFromKey<Foo | Bar, 'common'>, {
-    foo: string
-    common: boolean
-  } | {
-    bar: number
-    common: boolean
-  }>>,
-  Expect<Equal<UnionToObjectFromKey<Foo | Bar | Other, 'common'>, {
-    foo: string
-    common: boolean
-  } | {
-    bar: number
-    common: boolean
-  }>>,
+  Expect<
+    Equal<
+      UnionToObjectFromKey<Foo | Bar, 'common'>,
+      | {
+          foo: string
+          common: boolean
+        }
+      | {
+          bar: number
+          common: boolean
+        }
+    >
+  >,
+  Expect<
+    Equal<
+      UnionToObjectFromKey<Foo | Bar | Other, 'common'>,
+      | {
+          foo: string
+          common: boolean
+        }
+      | {
+          bar: number
+          common: boolean
+        }
+    >
+  >,
 ]

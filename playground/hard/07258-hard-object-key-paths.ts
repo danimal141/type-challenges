@@ -41,15 +41,15 @@ const ref = {
 }
 
 type cases = [
-  Expect<Equal<ObjectKeyPaths<{ name: string, age: number }>, 'name' | 'age'>>,
+  Expect<Equal<ObjectKeyPaths<{ name: string; age: number }>, 'name' | 'age'>>,
   Expect<
-  Equal<
-  ObjectKeyPaths<{
-    refCount: number
-    person: { name: string, age: number }
-  }>,
-  'refCount' | 'person' | 'person.name' | 'person.age'
-  >
+    Equal<
+      ObjectKeyPaths<{
+        refCount: number
+        person: { name: string; age: number }
+      }>,
+      'refCount' | 'person' | 'person.name' | 'person.age'
+    >
   >,
   Expect<ExpectExtends<ObjectKeyPaths<typeof ref>, 'count'>>,
   Expect<ExpectExtends<ObjectKeyPaths<typeof ref>, 'person'>>,

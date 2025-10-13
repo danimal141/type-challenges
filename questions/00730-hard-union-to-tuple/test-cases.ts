@@ -13,5 +13,10 @@ type cases = [
   Expect<Equal<ExtractValuesOfTuple<UnionToTuple<'d' | 'f' | 1 | never>>, 'f' | 'd' | 1>>,
   Expect<Equal<ExtractValuesOfTuple<UnionToTuple<[{ a: 1 }] | 1>>, [{ a: 1 }] | 1>>,
   Expect<Equal<ExtractValuesOfTuple<UnionToTuple<never>>, never>>,
-  Expect<Equal<ExtractValuesOfTuple<UnionToTuple<'a' | 'b' | 'c' | 1 | 2 | 'd' | 'e' | 'f' | 'g'>>, 'f' | 'e' | 1 | 2 | 'g' | 'c' | 'd' | 'a' | 'b'>>,
+  Expect<
+    Equal<
+      ExtractValuesOfTuple<UnionToTuple<'a' | 'b' | 'c' | 1 | 2 | 'd' | 'e' | 'f' | 'g'>>,
+      'f' | 'e' | 1 | 2 | 'g' | 'c' | 'd' | 'a' | 'b'
+    >
+  >,
 ]

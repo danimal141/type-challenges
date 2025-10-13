@@ -6,8 +6,7 @@ import type { Quiz, QuizMetaInfo } from './types'
 import { defaultLocale, supportedLocales } from './locales'
 
 export async function loadFile(filepath: string) {
-  if (fs.existsSync(filepath))
-    return await fs.readFile(filepath, 'utf-8')
+  if (fs.existsSync(filepath)) return await fs.readFile(filepath, 'utf-8')
   return undefined
 }
 
@@ -19,17 +18,15 @@ export async function loadLocaleVariations<T = string>(
   const data: Record<string, T> = {}
 
   for (const locale of supportedLocales) {
-    const file = preprocessor(await loadFile(path.join(dir, `${name}.${locale}${ext}`)) || '')
+    const file = preprocessor((await loadFile(path.join(dir, `${name}.${locale}${ext}`))) || '')
 
-    if (file)
-      data[locale] = file
+    if (file) data[locale] = file
   }
 
   if (!data[defaultLocale]) {
     // default version
-    const file = preprocessor(await loadFile(filepath) || '')
-    if (file)
-      data[defaultLocale] = file
+    const file = preprocessor((await loadFile(filepath)) || '')
+    if (file) data[defaultLocale] = file
   }
 
   return data
@@ -44,8 +41,7 @@ export function readmeCleanUp(text: string) {
 
 export function loadInfo(s: string): Partial<QuizMetaInfo> | undefined {
   const object = YAML.load(s) as any
-  if (!object)
-    return undefined
+  if (!object) return undefined
 
   const arrayKeys = ['tags', 'related']
 
@@ -56,8 +52,7 @@ export function loadInfo(s: string): Partial<QuizMetaInfo> | undefined {
         .split(',')
         .map((i: string) => i.trim())
         .filter(Boolean)
-    }
-    else {
+    } else {
       object[key] = undefined
     }
   }
@@ -73,9 +68,7 @@ export async function loadQuizzes(): Promise<Quiz[]> {
     cwd: QUIZ_ROOT,
   })
 
-  const quizzes = await Promise.all(
-    folders.map(async dir => loadQuiz(dir)),
-  )
+  const quizzes = await Promise.all(folders.map(async dir => loadQuiz(dir)))
 
   return quizzes
 }
@@ -87,7 +80,7 @@ export async function loadQuiz(dir: string): Promise<Quiz> {
     path: dir,
     info: await loadLocaleVariations(path.join(QUIZ_ROOT, dir, 'info.yml'), loadInfo),
     readme: await loadLocaleVariations(path.join(QUIZ_ROOT, dir, 'README.md'), readmeCleanUp),
-    template: await loadFile(path.join(QUIZ_ROOT, dir, 'template.ts')) || '',
+    template: (await loadFile(path.join(QUIZ_ROOT, dir, 'template.ts'))) || '',
     tests: await loadFile(path.join(QUIZ_ROOT, dir, 'test-cases.ts')),
   }
 }
@@ -98,8 +91,7 @@ export async function loadQuizByNo(no: number | string) {
     cwd: QUIZ_ROOT,
   })
 
-  if (folders.length)
-    return await loadQuiz(folders[0])
+  if (folders.length) return await loadQuiz(folders[0])
 
   return undefined
 }
@@ -111,7 +103,10 @@ export function resolveInfo(quiz: Quiz, locale: string = defaultLocale) {
 
   if (typeof info.tags === 'string')
     // @ts-expect-error
-    info.tags = info.tags.split(',').map(i => i.trim()).filter(Boolean)
+    info.tags = info.tags
+      .split(',')
+      .map(i => i.trim())
+      .filter(Boolean)
 
   return info as QuizMetaInfo
 }

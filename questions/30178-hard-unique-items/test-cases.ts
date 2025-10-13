@@ -25,16 +25,11 @@ uniqueItems(['test', undefined, 'test'])
 
 // Bonus: Should give detailed errors
 uniqueItems([
-  1,
-  2,
+  1, 2,
   // @ts-expect-error
-  2,
-  3,
-  4,
+  2, 3, 4,
   // @ts-expect-error
-  4,
-  6,
-  7,
+  4, 6, 7,
 ])
 
 uniqueItems([

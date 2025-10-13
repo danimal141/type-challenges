@@ -8,12 +8,10 @@ export const DOMAIN = 'https://tsch.js.org'
 export const TYPESCRIPT_PLAYGROUND = 'https://www.typescriptlang.org/play'
 
 // https://github.com/microsoft/TypeScript-Website/tree/v2/packages/playground
-export function toPlaygroundUrl(
-  code: string,
-  config: Object = {},
-  site = TYPESCRIPT_PLAYGROUND,
-) {
-  return `${site}?${Object.entries(config).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')}#code/${lzs.compressToEncodedURIComponent(code)}`
+export function toPlaygroundUrl(code: string, config: Object = {}, site = TYPESCRIPT_PLAYGROUND) {
+  return `${site}?${Object.entries(config)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&')}#code/${lzs.compressToEncodedURIComponent(code)}`
 }
 
 export function toSolutionsFull(no: number) {
@@ -37,7 +35,9 @@ export function toRawREADME(quiz: Quiz, locale?: string) {
 
 export function toQuestionsRawREADME(locale?: string) {
   const provider = 'https://cdn.jsdelivr.net/gh/type-challenges/type-challenges'
-  return locale && locale !== defaultLocale ? `${provider}/README.${locale}.md` : `${provider}/README.md`
+  return locale && locale !== defaultLocale
+    ? `${provider}/README.${locale}.md`
+    : `${provider}/README.md`
 }
 
 export function toNearborREADME(quiz: Quiz, locale?: string) {
@@ -57,9 +57,7 @@ export function toShareAnswerFull(quiz: Quiz, locale: string = defaultLocale) {
 // Short
 
 export function toReadmeShort(no: number, locale?: string) {
-  return locale !== defaultLocale
-    ? `${DOMAIN}/${no}/${locale}`
-    : `${DOMAIN}/${no}`
+  return locale !== defaultLocale ? `${DOMAIN}/${no}/${locale}` : `${DOMAIN}/${no}`
 }
 
 export function toSolutionsShort(no: number) {
@@ -67,19 +65,13 @@ export function toSolutionsShort(no: number) {
 }
 
 export function toPlayShort(no: number, locale?: string) {
-  return locale !== defaultLocale
-    ? `${DOMAIN}/${no}/play/${locale}`
-    : `${DOMAIN}/${no}/play`
+  return locale !== defaultLocale ? `${DOMAIN}/${no}/play/${locale}` : `${DOMAIN}/${no}/play`
 }
 
 export function toAnswerShort(no: number, locale?: string) {
-  return locale !== defaultLocale
-    ? `${DOMAIN}/${no}/answer/${locale}`
-    : `${DOMAIN}/${no}/answer`
+  return locale !== defaultLocale ? `${DOMAIN}/${no}/answer/${locale}` : `${DOMAIN}/${no}/answer`
 }
 
 export function toHomepageShort(locale?: string) {
-  return locale !== defaultLocale
-    ? `${DOMAIN}/${locale}`
-    : `${DOMAIN}`
+  return locale !== defaultLocale ? `${DOMAIN}/${locale}` : `${DOMAIN}`
 }

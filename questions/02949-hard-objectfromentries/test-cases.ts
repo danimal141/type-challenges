@@ -8,6 +8,4 @@ interface Model {
 
 type ModelEntries = ['name', string] | ['age', number] | ['locations', string[] | null]
 
-type cases = [
-  Expect<Equal<ObjectFromEntries<ModelEntries>, Model>>,
-]
+type cases = [Expect<Equal<ObjectFromEntries<ModelEntries>, Model>>]

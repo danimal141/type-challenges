@@ -47,10 +47,8 @@ type cases = [
   Expect<Equal<Unbox<(number | string)[]>, number | string>>,
   Expect<Equal<Unbox<[number]>, number>>,
   Expect<Equal<Unbox<Promise<number>>, number>>,
-
   // Bonus: Recursion
   Expect<Equal<Unbox<() => Promise<() => Array<Promise<boolean>>>>, boolean>>,
-
   // Bonus: Recursion levels
   Expect<Equal<Unbox<() => () => () => () => number, 0>, number>>,
   Expect<Equal<Unbox<() => () => () => () => number, 1>, () => () => () => number>>,

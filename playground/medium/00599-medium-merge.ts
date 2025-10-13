@@ -42,11 +42,16 @@ type Bar = {
 }
 
 type cases = [
-  Expect<Equal<Merge<Foo, Bar>, {
-    a: number
-    b: number
-    c: boolean
-  }>>,
+  Expect<
+    Equal<
+      Merge<Foo, Bar>,
+      {
+        a: number
+        b: number
+        c: boolean
+      }
+    >
+  >,
 ]
 
 /* _____________ 次のステップ _____________ */

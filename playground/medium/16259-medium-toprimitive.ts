@@ -68,9 +68,7 @@ type ExpectedResult = {
   fn: Function
 }
 
-type cases = [
-  Expect<Equal<ToPrimitive<PersonInfo>, ExpectedResult>>,
-]
+type cases = [Expect<Equal<ToPrimitive<PersonInfo>, ExpectedResult>>]
 
 /* _____________ 次のステップ _____________ */
 /*

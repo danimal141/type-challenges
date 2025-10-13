@@ -71,7 +71,6 @@ type cases = [
   IsTrue<Equal<Tag<null, 'foo'>, null>>,
   IsTrue<Equal<Tag<undefined, 'foo'>, undefined>>,
   IsTrue<Equal<'x', keyof Tag<{ x: 0 }, 'foo'> & string>>,
-
   /**
    * GetTags.
    */
@@ -85,13 +84,7 @@ type cases = [
   IsTrue<Equal<GetTags<Tag<string, 'foo'>>, ['foo']>>,
   IsTrue<Equal<GetTags<Tag<never, 'foo'>>, ['foo']>>,
   IsTrue<Equal<GetTags<Tag<Tag<string, 'foo'>, 'bar'>>, ['foo', 'bar']>>,
-  IsTrue<
-  Equal<
-  GetTags<Tag<Tag<Tag<{}, 'foo'>, 'bar'>, 'baz'>>,
-  ['foo', 'bar', 'baz']
-  >
-  >,
-
+  IsTrue<Equal<GetTags<Tag<Tag<Tag<{}, 'foo'>, 'bar'>, 'baz'>>, ['foo', 'bar', 'baz']>>,
   /**
    * UnTag.
    */
@@ -100,7 +93,6 @@ type cases = [
   IsTrue<Equal<UnTag<Tag<{}, 'foo'>>, {}>>,
   IsTrue<Equal<UnTag<Tag<Tag<{ x: 0 }, 'foo'>, 'bar'>>, { x: 0 }>>,
   IsTrue<Equal<keyof UnTag<Tag<Tag<number, 'foo'>, 'bar'>>, keyof number>>,
-
   /**
    * HasTag.
    */
@@ -122,7 +114,6 @@ type cases = [
   Expect<Equal<HasTag<Tag<{}, 'foo'>, 'foo'>, true>>,
   Expect<Equal<HasTag<Tag<{}, 'foo'>, 'bar'>, false>>,
   Expect<Equal<HasTag<{}, 'foo'>, false>>,
-
   /**
    * HasTags.
    */
@@ -142,7 +133,6 @@ type cases = [
   Expect<Equal<HasTags<Tag<Tag<Tag<0, 'foo'>, 'bar'>, 'baz'>, ['foo', 'bar']>, true>>,
   Expect<Equal<HasTags<Tag<Tag<Tag<{}, 'foo'>, 'baz'>, 'bar'>, ['foo', 'bar']>, false>>,
   Expect<Equal<HasTags<Tag<Tag<unknown, 'foo'>, 'bar'>, ['foo', 'bar']>, true>>,
-
   /**
    * HasExactTags.
    */

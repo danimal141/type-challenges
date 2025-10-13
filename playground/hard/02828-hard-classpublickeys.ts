@@ -47,9 +47,7 @@ class A {
   }
 }
 
-type cases = [
-  Expect<Equal<ClassPublicKeys<A>, 'str' | 'getNum'>>,
-]
+type cases = [Expect<Equal<ClassPublicKeys<A>, 'str' | 'getNum'>>]
 
 /* _____________ 次のステップ _____________ */
 /*

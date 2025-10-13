@@ -24,8 +24,8 @@ type GetOptional<T> = any
 import type { Equal, Expect } from '@type-challenges/utils'
 
 type cases = [
-  Expect<Equal<GetOptional<{ foo: number, bar?: string }>, { bar?: string }>>,
-  Expect<Equal<GetOptional<{ foo: undefined, bar?: undefined }>, { bar?: undefined }>>,
+  Expect<Equal<GetOptional<{ foo: number; bar?: string }>, { bar?: string }>>,
+  Expect<Equal<GetOptional<{ foo: undefined; bar?: undefined }>, { bar?: undefined }>>,
 ]
 
 /* _____________ 次のステップ _____________ */

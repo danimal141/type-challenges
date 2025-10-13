@@ -11,6 +11,8 @@
     "build": "esno ./scripts/build.ts",
     "generate": "esno ./scripts/generate-play.ts",
     "lint": "eslint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
     "translate": "esno ./scripts/translate-cli.ts",
     "utils:release": "pnpm -C utils release"
   },
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.0",
+    "@biomejs/biome": "^2.2.5",
     "@type-challenges/utils": "workspace:*",
     "@types/fs-extra": "^11.0.4",
     "@types/js-yaml": "^4.0.9",

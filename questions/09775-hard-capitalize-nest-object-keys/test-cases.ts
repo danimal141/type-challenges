@@ -7,11 +7,11 @@ type foo = {
 
 type Foo = {
   Foo: string
-  Bars: [{
-    Foo: string
-  }]
+  Bars: [
+    {
+      Foo: string
+    },
+  ]
 }
 
-type cases = [
-  Expect<Equal<Foo, CapitalizeNestObjectKeys<foo>>>,
-]
+type cases = [Expect<Equal<Foo, CapitalizeNestObjectKeys<foo>>>]

@@ -3,10 +3,10 @@ export const defaultLocale = 'en'
 export const supportedLocales = ['en', 'zh-CN', 'ja', 'ko', 'pt-BR'] as const
 
 export const messages = {
-  'en': require('./locales/en.json'),
+  en: require('./locales/en.json'),
   'zh-CN': require('./locales/zh-CN.json'),
-  'ja': require('./locales/ja.json'),
-  'ko': require('./locales/ko.json'),
+  ja: require('./locales/ja.json'),
+  ko: require('./locales/ko.json'),
   'pt-BR': require('./locales/pt-BR.json'),
 }
 
@@ -14,13 +14,11 @@ export type SupportedLocale = keyof typeof messages
 
 export function t(locale: SupportedLocale, key: string): string {
   const result = (messages[locale] && messages[locale][key]) || messages[defaultLocale][key]
-  if (!result)
-    throw new Error(`Missing message for key "${key}"`)
+  if (!result) throw new Error(`Missing message for key "${key}"`)
   return result
 }
 
 export function f(name: string, locale: string, ext: string) {
-  if (locale === defaultLocale)
-    return `${name}.${ext}`
+  if (locale === defaultLocale) return `${name}.${ext}`
   return `${name}.${locale}.${ext}`
 }

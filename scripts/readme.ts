@@ -4,7 +4,13 @@ import fs from 'fs-extra'
 import type { SupportedLocale } from './locales'
 import { defaultLocale, f, supportedLocales, t } from './locales'
 import { loadQuizzes, resolveInfo } from './loader'
-import { toAnswerShort, toNearborREADME, toPlayShort, toQuizREADME, toSolutionsShort } from './toUrl'
+import {
+  toAnswerShort,
+  toNearborREADME,
+  toPlayShort,
+  toQuizREADME,
+  toSolutionsShort,
+} from './toUrl'
 import type { Quiz, QuizMetaInfo } from './types'
 
 const DifficultyColors: Record<string, string> = {
@@ -15,13 +21,7 @@ const DifficultyColors: Record<string, string> = {
   extreme: 'b11b8d',
 }
 
-const DifficultyRank = [
-  'warm',
-  'easy',
-  'medium',
-  'hard',
-  'extreme',
-]
+const DifficultyRank = ['warm', 'easy', 'medium', 'hard', 'extreme']
 
 function escapeHtml(unsafe: string) {
   return unsafe
@@ -44,7 +44,13 @@ export function toBadgeLink(url: string, label: string, text: string, color: str
   return `<a href="${url}" target="_blank">${toBadge(label, text, color, args)}</a> `
 }
 
-export function toPlanTextLink(url: string, _label: string, text: string, _color: string, _args = '') {
+export function toPlanTextLink(
+  url: string,
+  _label: string,
+  text: string,
+  _color: string,
+  _args = '',
+) {
   return `<a href="${url}" target="_blank">${text}</a> `
 }
 
@@ -57,7 +63,11 @@ function toDifficultyBadge(difficulty: string, locale: SupportedLocale) {
 }
 
 function toDifficultyBadgeInverted(difficulty: string, locale: SupportedLocale, count: number) {
-  return toBadge(t(locale, `difficulty.${difficulty}`), count.toString(), DifficultyColors[difficulty])
+  return toBadge(
+    t(locale, `difficulty.${difficulty}`),
+    count.toString(),
+    DifficultyColors[difficulty],
+  )
 }
 
 function toDifficultyPlainText(difficulty: string, locale: SupportedLocale, count: number) {
@@ -78,7 +88,12 @@ function quizToBadge(quiz: Quiz, locale: string, absolute = false, badge = true)
   )
 }
 
-function quizNoToBadges(ids: (string | number)[], quizzes: Quiz[], locale: string, absolute = false) {
+function quizNoToBadges(
+  ids: (string | number)[],
+  quizzes: Quiz[],
+  locale: string,
+  absolute = false,
+) {
   return ids
     .map(i => quizzes.find(q => q.no === Number(i)))
     .filter(Boolean)
@@ -90,22 +105,25 @@ function getAllTags(quizzes: Quiz[], locale: string) {
   const set = new Set<string>()
   for (const quiz of quizzes) {
     const info = resolveInfo(quiz, locale)
-    for (const tag of (info?.tags || []))
-      set.add(tag)
+    for (const tag of info?.tags || []) set.add(tag)
   }
   return Array.from(set).sort()
 }
 
 function getQuizzesByTag(quizzes: Quiz[], locale: string, tag: string) {
-  return quizzes.filter((quiz) => {
+  return quizzes.filter(quiz => {
     const info = resolveInfo(quiz, locale)
     return !!info.tags?.includes(tag)
   })
 }
 
-async function insertInfoReadme(filepath: string, quiz: Quiz, locale: SupportedLocale, quizzes: Quiz[]) {
-  if (!fs.existsSync(filepath))
-    return
+async function insertInfoReadme(
+  filepath: string,
+  quiz: Quiz,
+  locale: SupportedLocale,
+  quizzes: Quiz[],
+) {
+  if (!fs.existsSync(filepath)) return
   let text = await fs.readFile(filepath, 'utf-8')
   /* eslint-disable prefer-template */
 
@@ -121,23 +139,47 @@ async function insertInfoReadme(filepath: string, quiz: Quiz, locale: SupportedL
   text = text
     .replace(
       /<!--info-header-start-->[\s\S]*<!--info-header-end-->/,
-      '<!--info-header-start-->'
-      + `<h1>${escapeHtml(info.title || '')} ${toDifficultyBadge(quiz.difficulty, locale)} ${(info.tags || []).map(i => toBadge('', `#${i}`, '999')).join(' ')}</h1>`
-      + `<blockquote><p>${toAuthorInfo(info.author)}</p></blockquote>`
-      + '<p>'
-      + toBadgeLink(toPlayShort(quiz.no, locale), '', t(locale, 'badge.take-the-challenge'), '3178c6', '?logo=typescript&logoColor=white')
-      + (availableLocales.length ? ('&nbsp;&nbsp;&nbsp;' + availableLocales.map(l => toBadgeLink(toNearborREADME(quiz, l), '', t(l, 'display'), 'gray')).join(' ')) : '')
-      + '</p>'
-      + '<!--info-header-end-->',
+      '<!--info-header-start-->' +
+        `<h1>${escapeHtml(info.title || '')} ${toDifficultyBadge(quiz.difficulty, locale)} ${(info.tags || []).map(i => toBadge('', `#${i}`, '999')).join(' ')}</h1>` +
+        `<blockquote><p>${toAuthorInfo(info.author)}</p></blockquote>` +
+        '<p>' +
+        toBadgeLink(
+          toPlayShort(quiz.no, locale),
+          '',
+          t(locale, 'badge.take-the-challenge'),
+          '3178c6',
+          '?logo=typescript&logoColor=white',
+        ) +
+        (availableLocales.length
+          ? '&nbsp;&nbsp;&nbsp;' +
+            availableLocales
+              .map(l => toBadgeLink(toNearborREADME(quiz, l), '', t(l, 'display'), 'gray'))
+              .join(' ')
+          : '') +
+        '</p>' +
+        '<!--info-header-end-->',
     )
     .replace(
       /<!--info-footer-start-->[\s\S]*<!--info-footer-end-->/,
-      '<!--info-footer-start--><br>'
-      + toBadgeLink(`../../${f('README', locale, 'md')}`, '', t(locale, 'badge.back'), 'grey')
-      + toBadgeLink(toAnswerShort(quiz.no, locale), '', t(locale, 'badge.share-your-solutions'), 'teal')
-      + toBadgeLink(toSolutionsShort(quiz.no), '', t(locale, 'badge.checkout-solutions'), 'de5a77', '?logo=awesome-lists&logoColor=white')
-      + (Array.isArray(info.related) && info.related.length ? `<hr><h3>${t(locale, 'readme.related-challenges')}</h3>${quizNoToBadges(info.related, quizzes, locale, true)}` : '')
-      + '<!--info-footer-end-->',
+      '<!--info-footer-start--><br>' +
+        toBadgeLink(`../../${f('README', locale, 'md')}`, '', t(locale, 'badge.back'), 'grey') +
+        toBadgeLink(
+          toAnswerShort(quiz.no, locale),
+          '',
+          t(locale, 'badge.share-your-solutions'),
+          'teal',
+        ) +
+        toBadgeLink(
+          toSolutionsShort(quiz.no),
+          '',
+          t(locale, 'badge.checkout-solutions'),
+          'de5a77',
+          '?logo=awesome-lists&logoColor=white',
+        ) +
+        (Array.isArray(info.related) && info.related.length
+          ? `<hr><h3>${t(locale, 'readme.related-challenges')}</h3>${quizNoToBadges(info.related, quizzes, locale, true)}`
+          : '') +
+        '<!--info-footer-end-->',
     )
 
   /* eslint-enable prefer-template */
@@ -154,7 +196,9 @@ async function updateIndexREADME(quizzes: Quiz[]) {
     let prev = ''
 
     // difficulty
-    const quizzesByDifficulty = [...quizzes].sort((a, b) => DifficultyRank.indexOf(a.difficulty) - DifficultyRank.indexOf(b.difficulty))
+    const quizzesByDifficulty = [...quizzes].sort(
+      (a, b) => DifficultyRank.indexOf(a.difficulty) - DifficultyRank.indexOf(b.difficulty),
+    )
 
     for (const quiz of quizzesByDifficulty) {
       if (prev !== quiz.difficulty)
@@ -170,13 +214,13 @@ async function updateIndexREADME(quizzes: Quiz[]) {
     const tags = getAllTags(quizzes, locale)
     for (const tag of tags) {
       challengesREADME += `<tr><td>${toBadge('', `#${tag}`, '999')}</td><td>`
-      getQuizzesByTag(quizzesByDifficulty, locale, tag)
-        .forEach((quiz) => {
-          challengesREADME += quizToBadge(quiz, locale)
-        })
+      getQuizzesByTag(quizzesByDifficulty, locale, tag).forEach(quiz => {
+        challengesREADME += quizToBadge(quiz, locale)
+      })
       challengesREADME += '</td></tr>'
     }
-    challengesREADME += '<tr><td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code></td><td></td></tr>'
+    challengesREADME +=
+      '<tr><td><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code></td><td></td></tr>'
     challengesREADME += '</tbody></table></details>'
 
     // by plain text
@@ -206,11 +250,7 @@ async function updateQuestionsREADME(quizzes: Quiz[]) {
   for (const quiz of quizzes) {
     for (const locale of supportedLocales) {
       await insertInfoReadme(
-        path.join(
-          questionsDir,
-          quiz.path,
-          f('README', locale, 'md'),
-        ),
+        path.join(questionsDir, quiz.path, f('README', locale, 'md')),
         quiz,
         locale,
         quizzes,
@@ -225,15 +265,10 @@ export async function updateREADMEs(type?: 'quiz' | 'index') {
 
   if (type === 'quiz') {
     await updateQuestionsREADME(quizzes)
-  }
-  else if (type === 'index') {
+  } else if (type === 'index') {
     await updateIndexREADME(quizzes)
-  }
-  else {
-    await Promise.all([
-      updateIndexREADME(quizzes),
-      updateQuestionsREADME(quizzes),
-    ])
+  } else {
+    await Promise.all([updateIndexREADME(quizzes), updateQuestionsREADME(quizzes)])
   }
 }
 

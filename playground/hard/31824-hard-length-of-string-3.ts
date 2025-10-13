@@ -21,15 +21,9 @@ import type { Equal, Expect } from '@type-challenges/utils'
 
 type Deced = [10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 type Signum = Deced[number]
-type Reped<
-  S extends string,
-  C extends Signum,
-  R extends string = '',
->
-  = (C extends 0
-    ? R
-    : Reped<S, Deced[C], `${R}${S}`>
-  )
+type Reped<S extends string, C extends Signum, R extends string = ''> = C extends 0
+  ? R
+  : Reped<S, Deced[C], `${R}${S}`>
 type t0 = 'k'
 type t1 = Reped<t0, 10>
 type t2 = Reped<t1, 10>
@@ -40,9 +34,7 @@ type t6 = Reped<t5, 10>
 type Signums<
   N extends string,
   Acc extends readonly Signum[] = [],
-> = N extends `${infer Head extends Signum}${infer Rest}`
-  ? Signums<Rest, [...Acc, Head]>
-  : Acc
+> = N extends `${infer Head extends Signum}${infer Rest}` ? Signums<Rest, [...Acc, Head]> : Acc
 type Gened<N extends string> = Signums<N> extends [
   infer N6 extends Signum,
   infer N5 extends Signum,
@@ -51,15 +43,12 @@ type Gened<N extends string> = Signums<N> extends [
   infer N2 extends Signum,
   infer N1 extends Signum,
   infer N0 extends Signum,
-] ? `${''
-  }${Reped<t6, N6>
-  }${Reped<t5, N5>
-  }${Reped<t4, N4>
-  }${Reped<t3, N3>
-  }${Reped<t2, N2>
-  }${Reped<t1, N1>
-  }${Reped<t0, N0>
-  }` : never
+]
+  ? `${''}${Reped<t6, N6>}${Reped<t5, N5>}${Reped<t4, N4>}${Reped<t3, N3>}${Reped<t2, N2>}${Reped<
+      t1,
+      N1
+    >}${Reped<t0, N0>}`
+  : never
 
 type cases = [
   Expect<Equal<LengthOfString<Gened<'0000000'>>, 0>>,

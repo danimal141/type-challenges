@@ -9,14 +9,13 @@ import { resolveFilePath } from '../utils/resolve'
 import { formatToCode } from './utils/formatToCode'
 
 const Messages = {
-  'en': {
+  en: {
     info: 'Info',
     template: 'Template',
     tests: 'Test Cases',
     issue_reply: '#{0} - Pull Request created.',
     issue_update_reply: '#{0} - Pull Request updated.',
-    issue_invalid_reply:
-      'Failed to parse the issue, please follow the template.',
+    issue_invalid_reply: 'Failed to parse the issue, please follow the template.',
     pr_auto_translate_tips: 'Auto translated by Google Translate',
   },
   'zh-CN': {
@@ -28,7 +27,7 @@ const Messages = {
     issue_invalid_reply: 'Issue 格式不正确，请按照依照模版修正',
     pr_auto_translate_tips: '通过谷歌 API 自动翻译',
   },
-  'ja': {
+  ja: {
     info: '基本情報',
     template: 'テンプレート',
     tests: 'テストケース',
@@ -39,19 +38,16 @@ const Messages = {
   },
 }
 
-export const getOthers = <A, B>(condition: boolean, a: A, b: B): A | B => condition ? a : b
+export const getOthers = <A, B>(condition: boolean, a: A, b: B): A | B => (condition ? a : b)
 
 const action: Action = async (github, context, core) => {
   const payload = context.payload || {}
   const issue = payload.issue
   const no = context.issue.number
 
-  if (!issue)
-    return
+  if (!issue) return
 
-  const labels: string[] = (issue.labels || [])
-    .map((i: any) => i && i.name)
-    .filter(Boolean)
+  const labels: string[] = (issue.labels || []).map((i: any) => i && i.name).filter(Boolean)
 
   // create pr for new challenge
   if (labels.includes('new-challenge')) {
@@ -67,8 +63,7 @@ const action: Action = async (github, context, core) => {
 
     try {
       info = YAML.load(infoRaw || '')
-    }
-    catch {
+    } catch {
       info = null
     }
 
@@ -77,11 +72,7 @@ const action: Action = async (github, context, core) => {
 
     // invalid issue
     if (!question || !template || !tests || !info) {
-      await updateComment(
-        github,
-        context,
-        Messages[locale].issue_invalid_reply,
-      )
+      await updateComment(github, context, Messages[locale].issue_invalid_reply)
       return
     }
 
@@ -93,8 +84,7 @@ const action: Action = async (github, context, core) => {
     if (!info.author) {
       info.author = info.author || {}
       info.author.github = issue.user.login
-      if (user)
-        info.author.name = user.name
+      if (user) info.author.name = user.name
     }
 
     core.info(`user: ${JSON.stringify(user)}`)
@@ -171,13 +161,8 @@ const action: Action = async (github, context, core) => {
     if (existing_pull) {
       core.info('-----Pull Request Existed-----')
       core.info(JSON.stringify(existing_pull, null, 2))
-      await updateComment(
-        github,
-        context,
-        createMessageBody(existing_pull.number),
-      )
-    }
-    else {
+      await updateComment(github, context, createMessageBody(existing_pull.number))
+    } else {
       core.info('-----Creating PR-----')
       const { data: pr } = await github.rest.pulls.create({
         owner: context.repo.owner,
@@ -199,11 +184,9 @@ const action: Action = async (github, context, core) => {
       core.info('-----Pull Request-----')
       core.info(JSON.stringify(pr, null, 2))
 
-      if (pr)
-        await updateComment(github, context, createMessageBody(pr.number))
+      if (pr) await updateComment(github, context, createMessageBody(pr.number))
     }
-  }
-  else {
+  } else {
     core.info('No matched labels, skipped')
   }
 }
@@ -215,9 +198,7 @@ async function updateComment(github: Github, context: Context, body: string) {
     repo: context.repo.repo,
   })
 
-  const existing_comment = comments.find(
-    i => i.user?.login === 'github-actions[bot]',
-  )
+  const existing_comment = comments.find(i => i.user?.login === 'github-actions[bot]')
 
   if (existing_comment) {
     return await github.rest.issues.updateComment({
@@ -227,8 +208,7 @@ async function updateComment(github: Github, context: Context, body: string) {
       repo: context.repo.repo,
       body,
     })
-  }
-  else {
+  } else {
     return await github.rest.issues.createComment({
       issue_number: context.issue.number,
       owner: context.repo.owner,
@@ -239,20 +219,16 @@ async function updateComment(github: Github, context: Context, body: string) {
 }
 
 function getCodeBlock(text: string, title: string, lang = 'ts') {
-  const regex = new RegExp(
-    `## ${title}[\\s\\S]*?\`\`\`${lang}([\\s\\S]*?)\`\`\``,
-  )
+  const regex = new RegExp(`## ${title}[\\s\\S]*?\`\`\`${lang}([\\s\\S]*?)\`\`\``)
   const match = text.match(regex)
-  if (match && match[1])
-    return match[1].toString().trim()
+  if (match && match[1]) return match[1].toString().trim()
   return null
 }
 
 function getCommentRange(text: string, key: string) {
   const regex = new RegExp(`<!--${key}-start-->([\\s\\S]*?)<!--${key}-end-->`)
   const match = text.match(regex)
-  if (match && match[1])
-    return match[1].toString().trim()
+  if (match && match[1]) return match[1].toString().trim()
   return null
 }
 
