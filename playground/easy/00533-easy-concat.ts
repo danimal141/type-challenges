@@ -18,7 +18,7 @@
 
 /* _____________ ここにコードを記入 _____________ */
 
-type Concat<T, U> = any
+type Concat<T extends readonly any[], U extends readonly any[]> = [...T, ...U]
 
 /* _____________ テストケース _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
