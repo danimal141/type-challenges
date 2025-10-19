@@ -166,3 +166,134 @@ TypeScriptの型システムでは、以下の対応関係があります：
 - JavaScript の `return includes(rest, target)` → 型の `Includes<Rest, U>`
 
 この対応により、ランタイムのロジックを型レベルで表現しています。
+
+### Equal型の実装
+
+`Equal`型は `@type-challenges/utils` で以下のように実装されています：
+
+```typescript
+export type Equal<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+    ? true
+    : false
+```
+
+#### ジェネリック関数の型互換性を利用したトリック
+
+この実装は、TypeScriptの型システムの深い部分を利用した高度なテクニックです。
+
+**基本原理：**
+- TypeScriptでは、**2つのジェネリック関数の型が完全に同じ場合にのみ、互いに代入可能**
+- この特性を利用して、型の厳密な等価性をチェックする
+
+**通常の`extends`との違い：**
+
+```typescript
+// 通常の extends は包含関係をチェック
+type Test1 = false extends boolean ? true : false  // true（falseはbooleanのサブタイプ）
+
+// ジェネリック関数を使うと厳密に比較される
+type Func1 = <T>() => T extends false ? 1 : 2
+type Func2 = <T>() => T extends boolean ? 1 : 2
+type Test2 = Func1 extends Func2 ? true : false  // false（関数の振る舞いが異なる）
+```
+
+#### 条件型の役割
+
+`T extends X ? 1 : 2` という条件型は、**Xの型情報を関数のシグネチャに埋め込む**ために使われます。
+
+```typescript
+// X = false の場合
+<T>() => T extends false ? 1 : 2
+
+// X = boolean の場合
+<T>() => T extends boolean ? 1 : 2
+
+// X = 1 | 2 の場合
+<T>() => T extends (1 | 2) ? 1 : 2
+```
+
+それぞれ**異なる関数型**になり、その違いが検出されます。
+
+#### なぜ完全一致だけがtrueになるのか
+
+ジェネリック型パラメータ `T` は**すべての可能な型**を表します。2つの関数型が `extends` で一致するには、**すべての可能なTに対して同じ結果を返す**必要があります。
+
+**例1: `Equal<false, boolean>` の場合**
+
+```typescript
+type Left  = <T>() => T extends false ? 1 : 2
+type Right = <T>() => T extends boolean ? 1 : 2
+
+// 任意のTに対して：
+//   - T = string のとき:  Left → 2, Right → 2 (同じ)
+//   - T = number のとき:  Left → 2, Right → 2 (同じ)
+//   - T = true のとき:    Left → 2, Right → 1 (違う！)
+//   ↑ここで違いが検出される
+// → Left extends Right は false
+// → Equal<false, boolean> = false
+```
+
+**例2: `Equal<boolean, boolean>` の場合**
+
+```typescript
+type Left  = <T>() => T extends boolean ? 1 : 2
+type Right = <T>() => T extends boolean ? 1 : 2
+
+// 任意のTに対して：
+//   - T = string のとき:  Left → 2, Right → 2
+//   - T = number のとき:  Left → 2, Right → 2
+//   - T = boolean のとき: Left → 1, Right → 1
+//   - T = true のとき:    Left → 1, Right → 1
+//   - すべてのケースで同じ結果！
+// → Left extends Right は true
+// → Equal<boolean, boolean> = true
+```
+
+#### 実際の比較例
+
+**1. 包含関係がある型**
+
+```typescript
+type Test = Equal<1, number>
+// <T>() => T extends 1 ? 1 : 2
+// <T>() => T extends number ? 1 : 2
+// T = 1.5 のとき: 左は2、右は1 → 違う → false
+```
+
+**2. Union型**
+
+```typescript
+type Test = Equal<1 | 2, 1>
+// <T>() => T extends (1 | 2) ? 1 : 2
+// <T>() => T extends 1 ? 1 : 2
+// T = 2 のとき: 左は1、右は2 → 違う → false
+```
+
+**3. readonly修飾子の違い**
+
+```typescript
+type Test = Equal<{ a: string }, { readonly a: string }>
+// <T>() => T extends { a: string } ? 1 : 2
+// <T>() => T extends { readonly a: string } ? 1 : 2
+// readonly の有無で extends の振る舞いが変わる → false
+```
+
+**4. 完全一致**
+
+```typescript
+type Test = Equal<{ a: string }, { a: string }>
+// <T>() => T extends { a: string } ? 1 : 2
+// <T>() => T extends { a: string } ? 1 : 2
+// まったく同じ → true
+```
+
+#### まとめ
+
+この実装の天才的なポイント：
+
+1. **ジェネリック型パラメータ `T`** が「すべての可能な型」を走査する
+2. **条件型** `T extends X ? 1 : 2` が型Xの特性を関数シグネチャに変換する
+3. **2つの関数が同じシグネチャを持つ** = XとYがすべてのケースで同じ振る舞い = **完全に同じ型**
+
+これにより、単純な `extends` では判別できない微妙な型の違い（readonly、Union型、リテラル型など）も正確に検出できます。
