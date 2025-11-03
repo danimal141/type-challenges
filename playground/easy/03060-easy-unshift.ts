@@ -18,7 +18,7 @@
 
 /* _____________ ここにコードを記入 _____________ */
 
-type Unshift<T, U> = any
+type Unshift<T extends any[], U extends any> = [U, ...T]
 
 /* _____________ テストケース _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
