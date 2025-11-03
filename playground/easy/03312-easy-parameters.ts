@@ -20,7 +20,7 @@
 
 /* _____________ ここにコードを記入 _____________ */
 
-type MyParameters<T extends (...args: any[]) => any> = any
+type MyParameters<T extends (...args: any[]) => any> = T extends (...args: infer P) => any ? P : never
 
 /* _____________ テストケース _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
